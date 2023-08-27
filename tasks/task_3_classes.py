@@ -25,155 +25,149 @@
 
 
 class LengthUnits:
-    BASE_UNIT = "m"
+    _BASE_UNIT = "m"
+    _FACTOR = 1
 
     def __init__(self, value):
-        self._value = value
+        if isinstance(value, LengthUnits):
+            self._value = value._to_base_units()
+        elif isinstance(value, (int, float)):
+            self._value = value
+        else:
+            raise ValueError("Invalid value type")
 
-    def to_base_units(self):
-        return self._value * self._factor
+    def _to_base_units(self):
+        return self._value * self._FACTOR
 
     def __str__(self):
-        return f"{self._value} {self.__class__.__name__}"
+        return f"{self._value / self._FACTOR} {self._BASE_UNIT}"
 
     def __eq__(self, other):
         if isinstance(other, LengthUnits):
-            other = other.to_base_units()
+            other = other._value
         elif isinstance(other, (int, float)):
-            other = other * self._factor
+            other *= self._FACTOR
         else:
-            return NotImplemented
+            raise TypeError("Unsupported operand type for equality comparison")
 
-        return self.to_base_units() == other
+        return self._value == other
 
     def __lt__(self, other):
         if isinstance(other, LengthUnits):
-            other = other.to_base_units()
+            other = other._value
         elif isinstance(other, (int, float)):
-            other = other * self._factor
+            other *= self._FACTOR
         else:
-            raise ValueError("Cannot compare different types of length units")
+            raise TypeError("Unsupported operand type for less than comparison")
 
-        return self.to_base_units() < other
+        return self._value < other
 
     def __add__(self, other):
         if isinstance(other, LengthUnits):
-            other = other.to_base_units()
+            other = other._value
         elif isinstance(other, (int, float)):
-            other = other * self._factor
+            other *= self._FACTOR
         else:
-            return NotImplemented
+            raise TypeError("Unsupported operand type for addition")
 
-        result = self.to_base_units() + other
-        return self.__class__(result / self._factor)
+        result = self._value + other
+        return self.__class__(result / self._FACTOR)
 
     def __iadd__(self, other):
         if isinstance(other, LengthUnits):
-            other = other.to_base_units()
+            other = other._value
         elif isinstance(other, (int, float)):
-            other = other * self._factor
+            other *= self._FACTOR
         else:
-            return NotImplemented
+            raise TypeError("Unsupported operand type for addition")
 
-        self._value += other / self._factor
-        return self
+        self._value += other
+        return self._value == other
 
     def __sub__(self, other):
         if isinstance(other, LengthUnits):
-            other = other.to_base_units()
+            other = other._value
         elif isinstance(other, (int, float)):
-            other = other * self._factor
+            other *= self._FACTOR
         else:
-            return NotImplemented
+            raise TypeError("Unsupported operand type for subtraction")
 
-        result = self.to_base_units() - other
-        return self.__class__(result / self._factor)
+        return self.__class__((self._value - other) / self._FACTOR)
 
     def __isub__(self, other):
         if isinstance(other, LengthUnits):
-            other = other.to_base_units()
+            other = other._value
         elif isinstance(other, (int, float)):
-            other = other * self._factor
+            other *= self._FACTOR
         else:
-            return NotImplemented
+            raise TypeError("Unsupported operand type for in-place subtraction")
 
-        self._value -= other / self._factor
+        self._value -= other
         return self
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):
-            result = self._value * other
-            return self.__class__(result)
-        else:
-            return NotImplemented
+            return self.__class__(self._value * other)
+        raise TypeError("Unsupported operand type for multiplication")
 
     def __imul__(self, other):
         if isinstance(other, (int, float)):
             self._value *= other
             return self
-        else:
-            return NotImplemented
+        raise TypeError("Unsupported operand type for multiplication")
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         if isinstance(other, (int, float)):
             result = self._value / other
             return self.__class__(result)
-        elif isinstance(other, LengthUnits):
-            result = self._value / (other.to_base_units() / self._factor)
-            return result
-        else:
-            return NotImplemented
+        raise TypeError("Unsupported operand type for division")
 
-    def __idiv__(self, other):
+    def __rtruediv__(self, other):
         if isinstance(other, (int, float)):
             self._value /= other
             return self
-        elif isinstance(other, LengthUnits):
-            self._value /= other.to_base_units() / self._factor
-            return self
-        else:
-            return NotImplemented
+        raise TypeError("Unsupported operand type for division")
 
 
 class Millimeters(LengthUnits):
-    _factor = 0.001
+    _FACTOR = 0.001
 
 
 class Centimeters(LengthUnits):
-    _factor = 0.01
+    _FACTOR = 0.01
 
 
 class Meters(LengthUnits):
-    _factor = 1
+    _FACTOR = 1
 
 
 class Kilometers(LengthUnits):
-    _factor = 1000
+    _FACTOR = 1000
 
 
 class Inches(LengthUnits):
-    _factor = 0.0254
+    _FACTOR = 0.0254
 
 
 class Feets(LengthUnits):
-    _factor = 0.3048
+    _FACTOR = 0.3048
 
 
 class Yards(LengthUnits):
-    _factor = 0.9144
+    _FACTOR = 0.9144
 
 
 class Miles(LengthUnits):
-    _factor = 1609.34
+    _FACTOR = 1609.34
 
 
 class Fen(LengthUnits):
-    _factor = 0.1
+    _FACTOR = 0.1
 
 
 class Chi(LengthUnits):
-    _factor = 0.33
+    _FACTOR = 0.33
 
 
 class In(LengthUnits):
-    _factor = 0.0254
+    _FACTOR = 0.0254

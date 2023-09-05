@@ -30,9 +30,9 @@ class LengthUnits:
 
     def __init__(self, value):
         if isinstance(value, LengthUnits):
-            self._value = value._to_base_units()
+            self._value = value._value
         elif isinstance(value, (int, float)):
-            self._value = value
+            self._value = self._to_base_units()
         else:
             raise ValueError("Invalid value type")
 
@@ -46,7 +46,7 @@ class LengthUnits:
         if isinstance(other, LengthUnits):
             other = other._value
         elif isinstance(other, (int, float)):
-            other *= self._FACTOR
+            other = self._to_base_units()
         else:
             raise TypeError("Unsupported operand type for equality comparison")
 
@@ -56,7 +56,7 @@ class LengthUnits:
         if isinstance(other, LengthUnits):
             other = other._value
         elif isinstance(other, (int, float)):
-            other *= self._FACTOR
+            other = self._to_base_units()
         else:
             raise TypeError("Unsupported operand type for less than comparison")
 
@@ -82,7 +82,7 @@ class LengthUnits:
             raise TypeError("Unsupported operand type for addition")
 
         self._value += other
-        return self._value == other
+        return self
 
     def __sub__(self, other):
         if isinstance(other, LengthUnits):
@@ -107,7 +107,9 @@ class LengthUnits:
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):
-            return self.__class__(self._value * other)
+            result = self.__class__(self._value * other)
+            result._value *= other
+            return result
         raise TypeError("Unsupported operand type for multiplication")
 
     def __imul__(self, other):
@@ -122,7 +124,7 @@ class LengthUnits:
             return self.__class__(result)
         raise TypeError("Unsupported operand type for division")
 
-    def __rtruediv__(self, other):
+    def __itruediv__(self, other):
         if isinstance(other, (int, float)):
             self._value /= other
             return self
